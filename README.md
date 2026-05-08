@@ -1,71 +1,50 @@
 # Ensalamento - Sistema de Alocação de Salas
 
-Sistema web para gerenciamento de alocações de salas de aula, com sincronização em tempo real entre usuários.
+Web app para gestão de ensalamento com sincronização em tempo real via Supabase.
 
-## 🚀 Tecnologias
+## 🚀 Projeto
 
+- **Deploy Vercel**: https://ensalamento-est.vercel.app
+- **Banco de dados**: Supabase
+- **Sincronização**: realtime entre até 2 usuários
 - **Frontend**: React + TypeScript + Vite
-- **UI**: shadcn/ui + Tailwind CSS
-- **Roteamento**: TanStack Router
-- **Banco de Dados**: Supabase (PostgreSQL)
-- **Sincronização**: Tempo real via Supabase Realtime
-- **Deploy**: Vercel
 
-## 📋 Pré-requisitos
+## 🧩 Instalação
 
-- Node.js 18+
-- Conta no Supabase
-- Conta no Vercel (opcional para deploy)
-
-## 🛠️ Instalação e Configuração
-
-### 1. Clone o repositório
-```bash
-git clone <seu-repositorio>
-cd ensalamento
-```
-
-### 2. Instale as dependências
 ```bash
 npm install
-```
-
-### 3. Configure as variáveis de ambiente
-
-Copie o arquivo de exemplo:
-```bash
-cp .env.example .env.local
-```
-
-Edite o `.env.local` com suas credenciais do Supabase:
-```env
-VITE_SUPABASE_URL=https://seu-projeto.supabase.co
-VITE_SUPABASE_ANON_KEY=sua-chave-anonima
-```
-
-### 4. Execute o projeto
-```bash
 npm run dev
 ```
 
-## 🌐 Deploy no Vercel
+## 🔧 Configuração
 
-### 1. Faça push do código
+Copie o arquivo de ambiente e preencha suas credenciais Supabase:
+
 ```bash
-git add .
-git commit -m "Deploy inicial"
-git push origin main
+copy .env.example .env.local
 ```
 
-### 2. Configure as variáveis de ambiente no Vercel
+Edite `.env.local` com:
 
-Siga as instruções no arquivo `VERCEL_ENV_VARS.md` para adicionar:
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+```env
+VITE_SUPABASE_URL=https://stewutteibgsgqpnbnqo.supabase.co
+VITE_SUPABASE_ANON_KEY=#42Tt10WeR6002
+```
 
-### 3. Deploy automático
+## 🧪 Scripts
 
-O Vercel fará o deploy automaticamente após o push. Você pode acompanhar o progresso no dashboard do Vercel.
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run lint
+```
+
+## 📌 Observações
+
+- Não commit `.env.local`.
+- O site de produção é `https://ensalamento-est.vercel.app`.
+- A rota SPA funciona graças aos rewrites do `vercel.json`.
 
 ## 📊 Funcionalidades
 
