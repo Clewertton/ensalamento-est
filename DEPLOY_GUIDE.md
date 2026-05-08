@@ -28,12 +28,6 @@ git push origin main
 2. **Clique em "Sign Up"** (pode usar sua conta GitHub)
 3. **Clique em "New Project"**
 4. **Selecione seu repositório** `ensalamento`
-5. **Configure as variáveis de ambiente**:
-   - Na seção **Environment Variables**, adicione:
-   ```
-   VITE_SUPABASE_URL=https://stewutteibgsgqpnbnqo.supabase.co
-   VITE_SUPABASE_ANON_KEY=#42Tt10WeR6002
-   ```
 6. **Clique em "Deploy"** 🚀
 
 **Pronto!** Seu site estará em: `https://ensalamento-xxx.vercel.app`
