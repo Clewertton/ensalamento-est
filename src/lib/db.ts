@@ -55,13 +55,17 @@ export const dbService = {
     },
 
     subscribe(callback: (rooms: Room[]) => void) {
-      return supabase
-        .from('rooms')
-        .on('*', (payload) => {
-          // Fetch all rooms when any change happens
-          dbService.rooms.getAll().then(callback);
-        })
+      const channel = supabase
+        .channel('rooms-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'rooms' },
+          () => {
+            dbService.rooms.getAll().then(callback);
+          },
+        )
         .subscribe();
+      return channel;
     },
   },
 
@@ -118,12 +122,17 @@ export const dbService = {
     },
 
     subscribe(callback: (courses: Course[]) => void) {
-      return supabase
-        .from('courses')
-        .on('*', (payload) => {
-          dbService.courses.getAll().then(callback);
-        })
+      const channel = supabase
+        .channel('courses-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'courses' },
+          () => {
+            dbService.courses.getAll().then(callback);
+          },
+        )
         .subscribe();
+      return channel;
     },
   },
 
@@ -166,12 +175,17 @@ export const dbService = {
     },
 
     subscribe(callback: (professors: Professor[]) => void) {
-      return supabase
-        .from('professors')
-        .on('*', (payload) => {
-          dbService.professors.getAll().then(callback);
-        })
+      const channel = supabase
+        .channel('professors-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'professors' },
+          () => {
+            dbService.professors.getAll().then(callback);
+          },
+        )
         .subscribe();
+      return channel;
     },
   },
 
@@ -297,12 +311,17 @@ export const dbService = {
     },
 
     subscribe(callback: (allocations: Allocation[]) => void) {
-      return supabase
-        .from('allocations')
-        .on('*', (payload) => {
-          dbService.allocations.getAll().then(callback);
-        })
+      const channel = supabase
+        .channel('allocations-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'allocations' },
+          () => {
+            dbService.allocations.getAll().then(callback);
+          },
+        )
         .subscribe();
+      return channel;
     },
   },
 };

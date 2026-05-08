@@ -24,11 +24,11 @@ Copie o arquivo de ambiente e preencha suas credenciais Supabase:
 copy .env.example .env.local
 ```
 
-Edite `.env.local` com:
+Edite `.env.local` com as credenciais do seu projeto Supabase:
 
 ```env
-VITE_SUPABASE_URL=https://stewutteibgsgqpnbnqo.supabase.co
-VITE_SUPABASE_ANON_KEY=#42Tt10WeR6002
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ## 🧪 Scripts
