@@ -1,0 +1,17 @@
+{
+  "name": "ensalamento-sync-server",
+  "version": "1.0.0",
+  "description": "Servidor de sincronização para o sistema de ensalamento acadêmico",
+  "main": "sync-server.js",
+  "scripts": {
+    "start": "node sync-server.js",
+    "dev": "node sync-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "keywords": ["sync", "server", "ensalamento"],
+  "author": "",
+  "license": "MIT"
+}
