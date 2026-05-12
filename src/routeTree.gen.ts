@@ -56,10 +56,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/courses' | '/professors'
+  fullPaths: '/' | '/courses' | '/professors' | '/rooms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/courses' | '/professors'
-  id: '__root__' | '/' | '/courses' | '/professors'
+  to: '/' | '/courses' | '/professors' | '/rooms'
+  id: '__root__' | '/' | '/courses' | '/professors' | '/rooms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -90,6 +90,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rooms': {
+      id: '/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof RoomsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
