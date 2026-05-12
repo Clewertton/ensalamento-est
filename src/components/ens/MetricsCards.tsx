@@ -15,7 +15,6 @@ interface Props {
 export function MetricsCards({ rooms, allocations }: Props) {
   const occupiedRoomIds = new Set(allocations.map((a) => a.roomId));
   const pending = allocations.filter((a) => a.status === "Pendente").length;
-  const conflict = allocations.filter((a) => a.status === "Conflito").length;
   const confirmed = allocations.filter((a) => a.status === "Confirmado").length;
 
   const items = [
@@ -36,12 +35,6 @@ export function MetricsCards({ rooms, allocations }: Props) {
       value: confirmed,
       icon: CheckCircle2,
       tone: "bg-success/15 text-success",
-    },
-    {
-      label: "Em conflito",
-      value: conflict,
-      icon: AlertTriangle,
-      tone: "bg-destructive/10 text-destructive",
     },
   ];
 
