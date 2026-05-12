@@ -243,9 +243,19 @@ export function KanbanBoard({ allocations, rooms, courses }: Props) {
               onChange={(e) => setNotesText(e.target.value)}
               rows={4}
             />
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingNotes(null)}>
                 Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (!editingNotes) return;
+                  setNotesText("");
+                  saveNotes(editingNotes);
+                }}
+              >
+                Excluir observação
               </Button>
               <Button onClick={() => editingNotes && saveNotes(editingNotes)}>
                 Salvar notas
