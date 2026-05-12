@@ -121,6 +121,18 @@ export const dbService = {
       return true;
     },
 
+    async updateByProfessorName(oldName: string, newName: string): Promise<boolean> {
+      const { error } = await supabase
+        .from('courses')
+        .update({ professor: newName })
+        .eq('professor', oldName);
+      if (error) {
+        console.error('Error updating courses for professor name change:', error);
+        return false;
+      }
+      return true;
+    },
+
     subscribe(callback: (courses: Course[]) => void) {
       const channel = supabase
         .channel('courses-realtime')
@@ -157,6 +169,20 @@ export const dbService = {
         .single();
       if (error) {
         console.error('Error creating professor:', error);
+        return null;
+      }
+      return data;
+    },
+
+    async update(id: string, updates: Partial<Professor>): Promise<Professor | null> {
+      const { data, error } = await supabase
+        .from('professors')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) {
+        console.error('Error updating professor:', error);
         return null;
       }
       return data;

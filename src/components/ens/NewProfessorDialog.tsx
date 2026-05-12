@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Plus, CheckCircle2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { store, uid, type Course, type Professor } from "@/lib/scheduling";
+import { dbService } from "@/lib/db";
+import { type Course, type Professor } from "@/lib/scheduling";
 
 interface Props {
   courses: Course[];
@@ -69,48 +70,59 @@ export function NewProfessorDialog({
     (p) => p.id !== professor?.id && p.name.toLowerCase() === name.trim().toLowerCase(),
   );
 
-  const submit = () => {
+  const submit = async () => {
     if (!canSubmit || nameExists) {
       if (nameExists) toast.error("Um professor com este nome já existe.");
       return;
     }
 
+    const trimmedName = name.trim();
+
     if (isEdit) {
       const updatedProfessor: Professor = {
         id: professor.id,
-        name: name.trim(),
+        name: trimmedName,
       };
-      const updatedProfessors = professors.map((p) =>
-        p.id === professor.id ? updatedProfessor : p,
-      );
-      store.setProfessors(updatedProfessors);
+      const result = await dbService.professors.update(professor.id, updatedProfessor);
+      if (!result) {
+        toast.error("Não foi possível atualizar o professor.");
+        return;
+      }
 
-      if (professor.name !== updatedProfessor.name) {
-        const updatedCourses = courses.map((c) =>
-          c.professor === professor.name
-            ? { ...c, professor: updatedProfessor.name }
-            : c,
+      if (professor.name !== trimmedName) {
+        const success = await dbService.courses.updateByProfessorName(
+          professor.name,
+          trimmedName,
         );
-        store.setCourses(updatedCourses);
+        if (!success) {
+          toast.error(
+            "Professor atualizado, mas não foi possível atualizar as turmas associadas.",
+          );
+        }
       }
 
       toast.success("Professor atualizado com sucesso!");
     } else {
-      const newProfessor: Professor = {
-        id: uid(),
-        name: name.trim(),
-      };
-      store.setProfessors([...professors, newProfessor]);
+      const newProfessor = await dbService.professors.create({
+        name: trimmedName,
+      });
+      if (!newProfessor) {
+        toast.error("Não foi possível cadastrar o professor.");
+        return;
+      }
       toast.success("Professor cadastrado com sucesso!");
     }
 
     setOpen(false);
   };
 
-  const deleteProfessor = () => {
+  const deleteProfessor = async () => {
     if (!professor) return;
-    const updatedProfessors = professors.filter((p) => p.id !== professor.id);
-    store.setProfessors(updatedProfessors);
+    const success = await dbService.professors.delete(professor.id);
+    if (!success) {
+      toast.error("Não foi possível excluir o professor.");
+      return;
+    }
     toast.success("Professor excluído com sucesso!");
     setOpen(false);
   };

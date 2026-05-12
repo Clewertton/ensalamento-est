@@ -31,7 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Plus, CheckCircle2, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { store, uid, type Course, type Professor } from "@/lib/scheduling";
+import { dbService } from "@/lib/db";
+import { type Course, type Professor } from "@/lib/scheduling";
 
 interface Props {
   courses: Course[]; // Lista atual de turmas para referência ou validação
@@ -85,7 +86,7 @@ export function NewCourseDialog({
     (c) => c.id !== course?.id && (c.id === code || c.name === name),
   );
 
-  const submit = () => {
+  const submit = async () => {
     if (!canSubmit || codeExists) {
       if (codeExists)
         toast.error("Uma turma com este nome ou código já existe.");
@@ -93,36 +94,43 @@ export function NewCourseDialog({
     }
 
     if (isEdit) {
-      // Editar
       const updatedCourse: Course = {
-        id: course.id, // Mantém o ID
+        id: course.id,
         name,
         professor,
         students,
       };
-      const updatedCourses = courses.map((c) =>
-        c.id === course.id ? updatedCourse : c,
-      );
-      store.setCourses(updatedCourses);
+      const result = await dbService.courses.update(course.id, updatedCourse);
+      if (!result) {
+        toast.error("Não foi possível atualizar a turma.");
+        return;
+      }
       toast.success("Turma atualizada com sucesso!");
     } else {
-      // Criar
       const newCourse: Course = {
-        id: uid(), // Ou usar o 'code' se preferir id manual
+        id: code,
         name,
         professor,
         students,
       };
-      store.setCourses([...courses, newCourse]);
+      const result = await dbService.courses.create(newCourse);
+      if (!result) {
+        toast.error("Não foi possível cadastrar a turma.");
+        return;
+      }
       toast.success("Turma cadastrada com sucesso!");
     }
+
     setOpen(false);
   };
 
-  const deleteCourse = () => {
+  const deleteCourse = async () => {
     if (!course) return;
-    const updatedCourses = courses.filter((c) => c.id !== course.id);
-    store.setCourses(updatedCourses);
+    const success = await dbService.courses.delete(course.id);
+    if (!success) {
+      toast.error("Não foi possível excluir a turma.");
+      return;
+    }
     toast.success("Turma excluída com sucesso!");
     setOpen(false);
   };
