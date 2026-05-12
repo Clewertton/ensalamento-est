@@ -6,7 +6,6 @@ import { WeekCalendar } from "@/components/ens/WeekCalendar";
 import { RecentList } from "@/components/ens/RecentList";
 import { KanbanBoard } from "@/components/ens/KanbanBoard";
 import { NewAllocationDialog } from "@/components/ens/NewAllocationDialog";
-import { NewRoomDialog } from "@/components/ens/NewRoomDialog";
 import { CalendarRange } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -51,7 +50,12 @@ function Dashboard() {
                 courses={courses}
                 allocations={allocations}
               />
-              <NewRoomDialog rooms={rooms} />
+              <Link
+                to="/rooms"
+                className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              >
+                Salas
+              </Link>
               <Link
                 to="/courses"
                 className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
@@ -70,7 +74,7 @@ function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <MetricsCards rooms={rooms} allocations={allocations} />
+        <MetricsCards rooms={rooms} allocations={allocations} courses={courses} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
