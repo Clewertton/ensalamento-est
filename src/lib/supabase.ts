@@ -14,6 +14,29 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export type Database = {
   public: {
     Tables: {
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          role: 'admin' | 'user';
+          created_at: string;
+          invited_by: string | null;
+        };
+        Insert: Omit<Database['public']['Tables']['users']['Row'], 'created_at'>;
+        Update: Partial<Database['public']['Tables']['users']['Insert']>;
+      };
+      invites: {
+        Row: {
+          id: string;
+          email: string;
+          code: string;
+          created_by: string;
+          used: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['invites']['Row'], 'created_at'>;
+        Update: Partial<Database['public']['Tables']['invites']['Insert']>;
+      };
       rooms: {
         Row: {
           id: string;

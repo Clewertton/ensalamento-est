@@ -1,15 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { useScheduling } from "@/hooks/use-scheduling";
 import { MetricsCards } from "@/components/ens/MetricsCards";
 import { WeekCalendar } from "@/components/ens/WeekCalendar";
 import { RecentList } from "@/components/ens/RecentList";
 import { KanbanBoard } from "@/components/ens/KanbanBoard";
-import { NewAllocationDialog } from "@/components/ens/NewAllocationDialog";
-import { CalendarRange } from "lucide-react";
+import { InviteGenerator } from "@/components/ens/InviteGenerator";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
+  beforeLoad: ({ context }) => {
+    // Note: context doesn't have auth directly, we'll check in component
+  },
   head: () => ({
     meta: [
       { title: "Ensalamento Acadêmico — Dashboard" },
@@ -23,7 +25,19 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const { user, loading, signOut, role } = useAuth();
   const { rooms, courses, allocations, professors, hydrated } = useScheduling();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: '/login' });
+    }
+  }, [loading, user, navigate]);
+
+  if (loading || !user) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,6 +82,15 @@ function Dashboard() {
               >
                 Professores
               </Link>
+              <Button
+                onClick={() => signOut()}
+                variant="outline"
+                size="sm"
+                className="inline-flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </Button>
             </div>
           )}
         </div>
@@ -75,6 +98,12 @@ function Dashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <MetricsCards rooms={rooms} allocations={allocations} courses={courses} />
+
+        {role === 'admin' && (
+          <div className="flex justify-center">
+            <InviteGenerator />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
