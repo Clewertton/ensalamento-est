@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
 import { dbService } from "@/lib/db";
 import {
   type Allocation,
@@ -16,7 +17,7 @@ import {
   type Room,
   type Status,
 } from "@/lib/scheduling";
-import { GripVertical, FileText } from "lucide-react";
+import { GripVertical, FileText, CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -36,28 +37,10 @@ export function KanbanBoard({ allocations, rooms, courses }: Props) {
   const [dragId, setDragId] = useState<string | null>(null);
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [notesText, setNotesText] = useState("");
-  const [reminderText, setReminderText] = useState("");
-  const [reminders, setReminders] = useState<string[]>([]);
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>(new Date());
 
   const courseById = (id: string) => courses.find((c) => c.id === id);
   const roomById = (id: string) => rooms.find((r) => r.id === id);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem("ensalamentoReminders");
-    if (stored) {
-      try {
-        setReminders(JSON.parse(stored));
-      } catch {
-        setReminders([]);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem("ensalamentoReminders", JSON.stringify(reminders));
-  }, [reminders]);
 
   const move = async (id: string, status: Status) => {
     try {
@@ -177,52 +160,22 @@ export function KanbanBoard({ allocations, rooms, courses }: Props) {
         <div className="rounded-xl bg-muted/40 border-t-4 border-t-secondary p-3 min-h-55">
           <div className="flex items-center justify-between mb-3 px-1">
             <div>
-              <h3 className="text-sm font-semibold text-foreground">
-                Observações
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                Calendário
               </h3>
               <p className="text-xs text-muted-foreground">
-                Anote lembretes rápidos do seu ensalamento.
+                Visualize o mês atual e navegue entre datas.
               </p>
             </div>
-            <Badge variant="secondary" className="tabular-nums">
-              {reminders.length}
-            </Badge>
           </div>
-          <div className="space-y-3">
-            <Textarea
-              value={reminderText}
-              onChange={(e) => setReminderText(e.target.value)}
-              placeholder="Escreva um lembrete ou observação..."
-              rows={4}
+          <div className="flex justify-center">
+            <Calendar
+              mode="single"
+              selected={calendarDate}
+              onSelect={setCalendarDate}
+              className="rounded-md border-0 bg-card"
             />
-            <Button
-              className="w-full"
-              onClick={() => {
-                const trimmed = reminderText.trim();
-                if (!trimmed) return;
-                setReminders((prev) => [trimmed, ...prev]);
-                setReminderText("");
-              }}
-              disabled={!reminderText.trim()}
-            >
-              Adicionar lembrete
-            </Button>
-            <div className="space-y-2">
-              {reminders.length > 0 ? (
-                reminders.map((note, index) => (
-                  <div
-                    key={`${note}-${index}`}
-                    className="rounded-lg border border-border/60 bg-card p-3"
-                  >
-                    <p className="text-sm text-foreground">{note}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Nenhum lembrete ainda.
-                </p>
-              )}
-            </div>
           </div>
         </div>
       </div>
