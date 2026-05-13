@@ -10,7 +10,7 @@ import { RecentList } from "@/components/ens/RecentList";
 import { KanbanBoard } from "@/components/ens/KanbanBoard";
 import { InviteGenerator } from "@/components/ens/InviteGenerator";
 import { NewAllocationDialog } from "@/components/ens/NewAllocationDialog";
-import { CalendarRange, LogOut } from "lucide-react";
+import { CalendarRange, LogOut, Shield } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -87,6 +87,15 @@ function Dashboard() {
               >
                 Professores
               </Link>
+              {role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center justify-center rounded-md border border-primary bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20 gap-1"
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin
+                </Link>
+              )}
               <Button
                 onClick={() => signOut()}
                 variant="outline"
