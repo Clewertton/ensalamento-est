@@ -51,10 +51,10 @@ export function Login() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2 animate-slide-up">
-            Sistema de Ensalamento
+            Ensalamento EST
           </h1>
           <p className="text-gray-600 animate-slide-up delay-200">
-            Universidade Estadual - Gestão Acadêmica
+            Universidade do Estado do Amazonas - Coordenação de Qualidade
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="transition-all duration-300 focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                  placeholder="seu.email@universidade.edu"
+                  placeholder="seu.email@uea.edu.br"
                 />
               </div>
               <div className="space-y-2">
@@ -127,7 +127,7 @@ export function Login() {
 
         {/* Footer */}
         <div className="text-center mt-8 text-xs text-gray-500 animate-fade-in delay-500">
-          <p>© 2024 Universidade Estadual - Todos os direitos reservados</p>
+          <p>© 2026 Coordenação de Qualidade - Todos os direitos reservados</p>
         </div>
       </div>
 
