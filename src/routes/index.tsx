@@ -1,11 +1,16 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
 import { useScheduling } from "@/hooks/use-scheduling";
 import { MetricsCards } from "@/components/ens/MetricsCards";
 import { WeekCalendar } from "@/components/ens/WeekCalendar";
 import { RecentList } from "@/components/ens/RecentList";
 import { KanbanBoard } from "@/components/ens/KanbanBoard";
 import { InviteGenerator } from "@/components/ens/InviteGenerator";
+import { NewAllocationDialog } from "@/components/ens/NewAllocationDialog";
+import { CalendarRange, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
