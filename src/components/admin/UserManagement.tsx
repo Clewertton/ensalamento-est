@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/lib/supabase';
-import { Loader2, Shield, User, Mail, Check, X } from 'lucide-react';
+import { Loader2, Shield, User, Check, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
 interface UserData {
   id: string;
   email: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'user' | 'pending';
   created_at: string;
 }
 
@@ -27,6 +27,7 @@ export function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<'approve' | 'promote' | 'demote' | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -50,19 +51,25 @@ export function UserManagement() {
     }
   };
 
-  const toggleAdminRole = async (user: UserData) => {
+  const openActionDialog = (user: UserData, action: 'approve' | 'promote' | 'demote') => {
     setSelectedUser(user);
+    setPendingAction(action);
     setShowConfirm(true);
   };
 
-  const confirmToggleRole = async () => {
-    if (!selectedUser) return;
+  const confirmAction = async () => {
+    if (!selectedUser || !pendingAction) return;
 
     setUpdatingId(selectedUser.id);
     setShowConfirm(false);
 
     try {
-      const newRole = selectedUser.role === 'admin' ? 'user' : 'admin';
+      const newRole =
+        pendingAction === 'approve'
+          ? 'user'
+          : pendingAction === 'promote'
+          ? 'admin'
+          : 'user';
 
       const { error: updateError } = await supabase
         .from('users')
@@ -71,7 +78,6 @@ export function UserManagement() {
 
       if (updateError) throw updateError;
 
-      // Atualizar lista local
       setUsers(
         users.map((u) =>
           u.id === selectedUser.id ? { ...u, role: newRole } : u
@@ -79,6 +85,7 @@ export function UserManagement() {
       );
 
       setSelectedUser(null);
+      setPendingAction(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao atualizar usuário');
     } finally {
@@ -143,10 +150,20 @@ export function UserManagement() {
                         {user.email}
                       </p>
                       <Badge
-                        variant={user.role === 'admin' ? 'default' : 'secondary'}
+                        variant={
+                          user.role === 'admin'
+                            ? 'default'
+                            : user.role === 'pending'
+                            ? 'secondary'
+                            : 'secondary'
+                        }
                         className="flex-shrink-0"
                       >
-                        {user.role === 'admin' ? 'Admin' : 'Usuário'}
+                        {user.role === 'admin'
+                          ? 'Admin'
+                          : user.role === 'pending'
+                          ? 'Pendente'
+                          : 'Usuário'}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -156,9 +173,24 @@ export function UserManagement() {
                 </div>
 
                 <Button
-                  variant={user.role === 'admin' ? 'destructive' : 'default'}
+                  variant={
+                    user.role === 'admin'
+                      ? 'destructive'
+                      : user.role === 'pending'
+                      ? 'default'
+                      : 'default'
+                  }
                   size="sm"
-                  onClick={() => toggleAdminRole(user)}
+                  onClick={() =>
+                    openActionDialog(
+                      user,
+                      user.role === 'admin'
+                        ? 'demote'
+                        : user.role === 'pending'
+                        ? 'approve'
+                        : 'promote'
+                    )
+                  }
                   disabled={updatingId === user.id}
                   className="ml-2 flex-shrink-0"
                 >
@@ -168,6 +200,11 @@ export function UserManagement() {
                     <>
                       <X className="h-4 w-4 mr-2" />
                       Remover Admin
+                    </>
+                  ) : user.role === 'pending' ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      Aprovar Usuário
                     </>
                   ) : (
                     <>
@@ -187,9 +224,11 @@ export function UserManagement() {
             <DialogHeader>
               <DialogTitle>Confirmar alteração de permissão</DialogTitle>
               <DialogDescription>
-                {selectedUser?.role === 'admin'
-                  ? `Tem certeza que deseja remover as permissões de administrador de ${selectedUser?.email}?`
-                  : `Tem certeza que deseja promover ${selectedUser?.email} a administrador?`}
+                {pendingAction === 'approve'
+                  ? `Tem certeza que deseja aprovar ${selectedUser?.email} como usuário?`
+                  : pendingAction === 'promote'
+                  ? `Tem certeza que deseja promover ${selectedUser?.email} a administrador?`
+                  : `Tem certeza que deseja remover as permissões de administrador de ${selectedUser?.email}?`}
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-2 justify-end">
@@ -197,12 +236,14 @@ export function UserManagement() {
                 Cancelar
               </Button>
               <Button
-                variant={selectedUser?.role === 'admin' ? 'destructive' : 'default'}
-                onClick={confirmToggleRole}
+                variant={pendingAction === 'demote' ? 'destructive' : 'default'}
+                onClick={confirmAction}
               >
-                {selectedUser?.role === 'admin'
-                  ? 'Remover Admin'
-                  : 'Promover Admin'}
+                {pendingAction === 'approve'
+                  ? 'Aprovar Usuário'
+                  : pendingAction === 'promote'
+                  ? 'Promover Admin'
+                  : 'Remover Admin'}
               </Button>
             </div>
           </DialogContent>

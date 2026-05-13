@@ -5,7 +5,7 @@ import { supabase } from './supabase';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  role: 'admin' | 'user' | null;
+  role: 'admin' | 'user' | 'pending' | null;
   loading: boolean;
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
@@ -29,7 +29,7 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<'admin' | 'user' | null>(null);
+  const [role, setRole] = useState<'admin' | 'user' | 'pending' | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchRole = async (userId: string) => {
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       .eq('id', userId)
       .single();
     if (!error && data) {
-      setRole(data.role);
+      setRole(data.role as 'admin' | 'user' | 'pending');
     } else {
       setRole(null);
     }
@@ -81,11 +81,56 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       return { error: { message: 'Apenas emails do domínio @uea.edu.br são permitidos.' } as AuthError };
     }
 
-    const { error } = await supabase.auth.signUp({
+    // Create auth user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
     });
-    return { error };
+
+    if (authError || !authData.user) {
+      return { error: authError };
+    }
+
+    // Check if this is the first user
+    const { data: existingUsers, error: usersError } = await supabase
+      .from('users')
+      .select('id')
+      .limit(1);
+
+    const isFirstUser = !usersError && (!existingUsers || existingUsers.length === 0);
+
+    // Create user record
+    const { error: insertError } = await supabase
+      .from('users')
+      .insert([
+        {
+          id: authData.user.id,
+          email,
+          role: isFirstUser ? 'admin' : 'pending',
+        },
+      ]);
+
+    if (insertError) {
+      return { error: insertError };
+    }
+
+    // If not first user, send approval request to admins
+    if (!isFirstUser) {
+      try {
+        const { data: admins } = await supabase
+          .from('users')
+          .select('email')
+          .eq('role', 'admin');
+
+        if (admins && admins.length > 0) {
+          console.log(`Notificação de aprovação enviada aos admins para novo cadastro: ${email}`);
+        }
+      } catch (err) {
+        console.error('Error notifying admins:', err);
+      }
+    }
+
+    return { error: null };
   };
 
   const signIn = async (email: string, password: string) => {
@@ -93,7 +138,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       email,
       password,
     });
-    return { error };
+
+    if (error) {
+      return { error };
+    }
+
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('email', email)
+      .single();
+
+    if (userError || userData?.role === 'pending') {
+      await supabase.auth.signOut();
+      return {
+        error: {
+          message: 'Sua conta está aguardando aprovação de um administrador. Você receberá um email em breve.',
+        } as AuthError,
+      };
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {

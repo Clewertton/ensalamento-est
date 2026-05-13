@@ -35,10 +35,10 @@ function Dashboard() {
   const { rooms, courses, allocations, professors, hydrated } = useScheduling();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && (!user || role === 'pending')) {
       navigate({ to: '/login' });
     }
-  }, [loading, user, navigate]);
+  }, [loading, user, role, navigate]);
 
   if (loading || !user) {
     return <div>Carregando...</div>;

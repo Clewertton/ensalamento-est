@@ -13,7 +13,6 @@ export function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
   const [isFirstUser, setIsFirstUser] = useState<boolean | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,48 +41,11 @@ export function Signup() {
 
     setLoading(true);
 
-    // Check if this is the first user
-    const { data: users, error: usersError } = await supabase
-      .from('users')
-      .select('id')
-      .limit(1);
-
-    const isFirstUser = !usersError && users && users.length === 0;
-
-    if (!isFirstUser) {
-      // Check invite code
-      const { data: invite, error: inviteError } = await supabase
-        .from('invites')
-        .select('*')
-        .eq('code', inviteCode)
-        .eq('used', false)
-        .single();
-
-      if (inviteError || !invite) {
-        setError('Código de convite inválido ou já utilizado.');
-        setLoading(false);
-        return;
-      }
-
-      if (invite.email !== email) {
-        setError('O email não corresponde ao convite.');
-        setLoading(false);
-        return;
-      }
-    }
-
     const { error } = await signUp(email, password);
 
     if (error) {
       setError(error.message);
     } else {
-      if (!isFirstUser) {
-        // Mark invite as used
-        await supabase
-          .from('invites')
-          .update({ used: true })
-          .eq('code', inviteCode);
-      }
       navigate({ to: '/login' });
     }
 
@@ -97,10 +59,18 @@ export function Signup() {
           <CardTitle>Cadastrar</CardTitle>
           <CardDescription>
             Crie sua conta para acessar o sistema. Apenas emails @uea.edu.br são permitidos.
+            Após o cadastro, contas novas serão aprovadas por um administrador.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isFirstUser !== null && (
+              <div className="rounded-lg border border-border/60 bg-muted/50 p-3 text-sm text-muted-foreground">
+                {isFirstUser
+                  ? 'Você será o primeiro administrador do sistema após completar o cadastro.'
+                  : 'Sua conta ficará pendente até que um administrador aprove o seu acesso.'}
+              </div>
+            )}
             <div>
               <Label htmlFor="email">Email (@uea.edu.br)</Label>
               <Input
@@ -121,18 +91,17 @@ export function Signup() {
                 required
               />
             </div>
-            {isFirstUser === false && (
-              <div>
-                <Label htmlFor="inviteCode">Código de Convite</Label>
-                <Input
-                  id="inviteCode"
-                  type="text"
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value)}
-                  required
-                />
-              </div>
-            )}
+            <div>
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
