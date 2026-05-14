@@ -3,6 +3,7 @@ import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 
 import "../styles.css";
 import { AuthProvider } from "../lib/auth";
+import { SchedulingProvider } from "../contexts/SchedulingContext";
 
 function NotFoundComponent() {
   return (
@@ -142,7 +143,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <SchedulingProvider>
+          <Outlet />
+        </SchedulingProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
-import { useScheduling } from "@/hooks/use-scheduling";
+import { useSharedScheduling } from "@/contexts/SchedulingContext";
 import { MetricsCards } from "@/components/ens/MetricsCards";
 import { WeekCalendar } from "@/components/ens/WeekCalendar";
 import { RecentList } from "@/components/ens/RecentList";
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 function Dashboard() {
   const navigate = useNavigate();
   const { user, loading, signOut, role } = useAuth();
-  const { rooms, courses, allocations, professors, hydrated } = useScheduling();
+  const { rooms, courses, allocations, professors, hydrated } = useSharedScheduling();
 
   useEffect(() => {
     if (!loading && (!user || role === 'pending')) {

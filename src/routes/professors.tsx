@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
-import { useScheduling } from "@/hooks/use-scheduling";
+import { useSharedScheduling } from "@/contexts/SchedulingContext";
 import { NewProfessorDialog } from "@/components/ens/NewProfessorDialog";
 import { ProfessorsList } from "@/components/ens/ProfessorsList";
 import { ArrowLeft } from "lucide-react";
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/professors")({
 });
 
 function ProfessorsPage() {
-  const { courses, professors, hydrated } = useScheduling();
+  const { courses, professors, hydrated } = useSharedScheduling();
 
   return (
     <div className="min-h-screen bg-background">
