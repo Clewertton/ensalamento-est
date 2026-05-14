@@ -16,15 +16,15 @@ export function Login() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error: signInError } = await signIn(email, password);
 
-    if (error) {
-      setError(error.message);
+    if (signInError) {
+      setError(signInError.message);
     } else {
       navigate({ to: '/' });
     }
@@ -34,7 +34,6 @@ export function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 relative overflow-hidden">
-      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-200/30 to-blue-200/30 rounded-full animate-pulse delay-1000"></div>
@@ -42,7 +41,6 @@ export function Login() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        {/* Institutional header */}
         <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center mb-4">
             <div className="relative">
@@ -125,7 +123,6 @@ export function Login() {
           </CardContent>
         </Card>
 
-        {/* Footer */}
         <div className="text-center mt-8 text-xs text-gray-500 animate-fade-in delay-500">
           <p>© 2026 Coordenação de Qualidade - Todos os direitos reservados</p>
         </div>

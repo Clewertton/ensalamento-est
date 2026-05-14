@@ -21,16 +21,16 @@ export function Signup() {
 
   useEffect(() => {
     const checkFirstUser = async () => {
-      const { data: users, error } = await supabase
+      const { data: users, error: fetchError } = await supabase
         .from('users')
         .select('id')
         .limit(1);
-      setIsFirstUser(!error && users && users.length === 0);
+      setIsFirstUser(!fetchError && users !== null && users.length === 0);
     };
     checkFirstUser();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
@@ -41,10 +41,10 @@ export function Signup() {
 
     setLoading(true);
 
-    const { error } = await signUp(email, password);
+    const { error: signUpError } = await signUp(email, password);
 
-    if (error) {
-      setError(error.message);
+    if (signUpError) {
+      setError(signUpError.message);
     } else {
       navigate({ to: '/login' });
     }
