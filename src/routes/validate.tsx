@@ -19,15 +19,27 @@ function ValidatePage() {
     // Tratamento de erros caso o link tenha expirado ou seja inválido
     if (query.includes('error_description=')) {
       const params = new URLSearchParams(query);
+      let msg = params.get('error_description') || 'Erro ao validar o link.';
+      
+      if (msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('invalid')) {
+        msg = 'O link de verificação é inválido ou já foi utilizado/expirou. Por favor, tente fazer login ou cadastre-se novamente.';
+      }
+      
       setStatus('error');
-      setErrorMessage(params.get('error_description') || 'Erro ao validar o link.');
+      setErrorMessage(msg);
       return;
     }
 
     if (hash.includes('error_description=')) {
       const params = new URLSearchParams(hash.substring(1));
+      let msg = params.get('error_description') || 'Erro ao validar o link.';
+      
+      if (msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('invalid')) {
+        msg = 'O link de verificação é inválido ou já foi utilizado/expirou. Por favor, tente fazer login ou cadastre-se novamente.';
+      }
+      
       setStatus('error');
-      setErrorMessage(params.get('error_description') || 'Erro ao validar o link.');
+      setErrorMessage(msg);
       return;
     }
 
