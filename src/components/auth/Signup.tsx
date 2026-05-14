@@ -13,10 +13,10 @@ export function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isFirstUser, setIsFirstUser] = useState<boolean | null>(null);
+  const [assignedRole, setAssignedRole] = useState('user');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,36 +41,47 @@ export function Signup() {
 
     setLoading(true);
 
-    const { error: signUpError } = await signUp(email, password);
+    // Repassando o papel atribuído no formulário para a função protegida
+    const { error: signUpError } = await signUp(email, password, assignedRole);
 
     if (signUpError) {
       setError(signUpError.message);
     } else {
-      navigate({ to: '/login' });
+      toast.success('Usuário criado com sucesso!');
+      // Pode limpar os campos para permitir um novo cadastro se desejar
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
     }
 
     setLoading(false);
   };
 
+  // Por que: Se não for administrador, sequer renderizamos o formulário.
+  // Isso garante que tentativas diretas de acessar a rota falhem visualmente no lado do cliente.
+  if (!authLoading && role !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 text-center">
+        <Card className="w-full max-w-md p-6">
+          <CardTitle className="text-destructive mb-2">Acesso Negado</CardTitle>
+          <CardDescription>Você precisa de privilégios de administrador para criar novas contas.</CardDescription>
+          <Button className="mt-4" onClick={() => navigate({ to: '/' })}>Voltar ao Início</Button>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Cadastrar</CardTitle>
+          <CardTitle>Cadastrar Novo Usuário</CardTitle>
           <CardDescription>
-            Crie sua conta para acessar o sistema. Apenas emails @uea.edu.br são permitidos.
-            Após o cadastro, contas novas serão aprovadas por um administrador.
+            Apenas administradores logados podem registrar novas contas no sistema.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {isFirstUser !== null && (
-              <div className="rounded-lg border border-border/60 bg-muted/50 p-3 text-sm text-muted-foreground">
-                {isFirstUser
-                  ? 'Você será o primeiro administrador do sistema após completar o cadastro.'
-                  : 'Sua conta ficará pendente até que um administrador aprove o seu acesso.'}
-              </div>
-            )}
             <div>
               <Label htmlFor="email">Email (@uea.edu.br)</Label>
               <Input
@@ -101,6 +112,18 @@ export function Signup() {
                 required
               />
             </div>
+            <div>
+              <Label htmlFor="role">Nível de Permissão</Label>
+              <select
+                id="role"
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={assignedRole}
+                onChange={(e) => setAssignedRole(e.target.value)}
+              >
+                <option value="user">Usuário Comum</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
 
             {error && (
               <Alert variant="destructive">
@@ -112,11 +135,6 @@ export function Signup() {
               Cadastrar
             </Button>
           </form>
-          <div className="mt-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Já tem conta? <a href="/login" className="text-primary hover:underline">Entrar</a>
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
