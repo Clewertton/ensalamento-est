@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
-import { useSharedScheduling } from "@/contexts/SchedulingContext";
+import { useSharedScheduling } from "@/lib/SchedulingContext";
 import { MetricsCards } from "@/components/ens/MetricsCards";
 import { WeekCalendar } from "@/components/ens/WeekCalendar";
 import { RecentList } from "@/components/ens/RecentList";

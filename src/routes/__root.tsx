@@ -3,7 +3,7 @@ import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 
 import "../styles.css";
 import { AuthProvider } from "../lib/auth";
-import { SchedulingProvider } from "../contexts/SchedulingContext";
+import { SchedulingProvider } from "../lib/SchedulingContext";
 
 function NotFoundComponent() {
   return (

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
-import { useSharedScheduling } from "@/contexts/SchedulingContext";
+import { useSharedScheduling } from "@/lib/SchedulingContext";
 import { NewCourseDialog } from "@/components/ens/NewClass";
 import { CoursesList } from "@/components/ens/CoursesList";
 import { ArrowLeft } from "lucide-react";
