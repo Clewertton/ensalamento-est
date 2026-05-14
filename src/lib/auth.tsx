@@ -94,45 +94,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       return { error: authError };
     }
 
-    // Check if this is the first user
-    const { data: existingUsers, error: usersError } = await supabase
-      .from('users')
-      .select('id')
-      .limit(1);
-
-    const isFirstUser = !usersError && (!existingUsers || existingUsers.length === 0);
-
-    // Create user record
-    const { error: insertError } = await supabase
-      .from('users')
-      .insert([
-        {
-          id: authData.user.id,
-          email,
-          role: isFirstUser ? 'admin' : 'pending',
-        },
-      ]);
-
-    if (insertError) {
-      return { error: insertError };
-    }
-
-    // If not first user, send approval request to admins
-    if (!isFirstUser) {
-      try {
-        const { data: admins } = await supabase
-          .from('users')
-          .select('email')
-          .eq('role', 'admin');
-
-        if (admins && admins.length > 0) {
-          console.log(`Notificação de aprovação enviada aos admins para novo cadastro: ${email}`);
-        }
-      } catch (err) {
-        console.error('Error notifying admins:', err);
-      }
-    }
-
     return { error: null };
   };
 
