@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function Signup() {
   const [email, setEmail] = useState('');
@@ -18,17 +19,6 @@ export function Signup() {
   const [loading, setLoading] = useState(false);
   const { signUp, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkFirstUser = async () => {
-      const { data: users, error: fetchError } = await supabase
-        .from('users')
-        .select('id')
-        .limit(1);
-      setIsFirstUser(!fetchError && users !== null && users.length === 0);
-    };
-    checkFirstUser();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
