@@ -40,7 +40,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .from('users')
         .select('role')
         .eq('id', userId)
-        .single();
+        // Por que: .maybeSingle() evita que o Supabase lance um erro HTTP 406 (Not Acceptable)
+        // caso o usuário ainda não exista na tabela pública, permitindo um tratamento gracioso.
+        .maybeSingle();
 
       if (error) throw error;
       setRole(data?.role as 'admin' | 'user' | 'pending');
@@ -129,9 +131,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .from('users')
         .select('role')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
-      if (userError || userData?.role === 'pending') {
+      // Por que: Se userData for nulo (usuário não foi copiado para a tabela pública), 
+      // tratamos como pendente por padrão (Menor Privilégio) em vez de quebrar a aplicação.
+      if (userError || !userData || userData.role === 'pending') {
         await supabase.auth.signOut();
         // Por que: Informamos claramente o motivo do bloqueio para o usuário legítimo sem revelar dados sensíveis.
         return { error: new Error('Sua conta está aguardando aprovação de um administrador.') };
